@@ -11,7 +11,6 @@ namespace Sitecore.XDB.ReshardingTool.Models
         public DateTime LastModified { get; set; }
         public DateTime Created { get; set; }
         public Guid ConcurrencyToken { get; set; }
-        public double Percentile { get; set; }
         public byte[] GetKey()
         {
             return PartitionKeyGenerator.Generate(ContactId);
