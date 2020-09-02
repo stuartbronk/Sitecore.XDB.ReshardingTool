@@ -25,14 +25,19 @@ namespace Sitecore.XDB.ReshardingTool.Services
             _retryDelay = retryDelay;
         }
 
-        public async Task<int> GetEntityesCountAsync<T>(IEnumerable<Shard> shards, string shardMapManagerConnectionString, string tableName, string where = null, string tableShortName = null) where T : new()
+        public async Task<long> GetEntityesCountAsync<T>(IEnumerable<Shard> shards, string shardMapManagerConnectionString, string tableName, string where = null, string tableShortName = null) where T : new()
         {
 #if DEBUG
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 #endif
-            int result = 0;
-            var query = $"SELECT COUNT(*) as count FROM {tableName} {tableShortName} {where}";
+            long result = 0;
+            //var query = $"SELECT COUNT(*) as count FROM {tableName} {tableShortName} {where}";
+
+            tableName = tableName.Replace("[xdb_collection].[", "").Replace("]","");
+            var query =
+                $"SELECT o.name, ddps.row_count as count FROM sys.indexes AS i INNER JOIN sys.objects AS o ON i.OBJECT_ID = o.OBJECT_ID INNER JOIN sys.dm_db_partition_stats AS ddps ON i.OBJECT_ID = ddps.OBJECT_ID AND i.index_id = ddps.index_id WHERE i.index_id < 2  AND o.is_ms_shipped = 0 AND o.name = '{tableName}'";
+
 
             using (MultiShardConnection conn = new MultiShardConnection(shards, Credentials(shardMapManagerConnectionString)))
             {
@@ -43,7 +48,7 @@ namespace Sitecore.XDB.ReshardingTool.Services
                     {
                         while (await reader.ReadAsync())
                         {
-                            result += (int)reader["count"];
+                            result += (long)reader["count"];
                         }
                     }
                 }
