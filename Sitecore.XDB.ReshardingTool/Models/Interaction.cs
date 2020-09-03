@@ -21,7 +21,6 @@ namespace Sitecore.XDB.ReshardingTool.Models
         public string Events { get; set; }
         public string UserAgent { get; set; }
         public int EngagementValue { get; set; }
-        public double Percentile { get; set; }
         public byte[] GetKey()
         {
             return PartitionKeyGenerator.Generate(InteractionId);
