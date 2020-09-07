@@ -80,20 +80,22 @@ namespace Sitecore.XDB.ReshardingTool
 
             _logger.Information("Interactions");
             string interactionsWhere = null;
-            if (interactionsFromDate != null)
-                interactionsWhere = $" WHERE i.Created > '{interactionsFromDate:yyyy-MM-dd HH:mm:ss.fff}' ";
+            //if (interactionsFromDate != null)
+            //    interactionsWhere = $" WHERE i.Created > '{interactionsFromDate:yyyy-MM-dd HH:mm:ss.fff}' ";
 
-            if (interactionsFilterByEventDefinitions != null && interactionsFilterByEventDefinitions.Any())
-            {
-                var term = $"({string.Join(" or ", interactionsFilterByEventDefinitions.Select(x => $"[Events] like '%\"DefinitionId\":\"{x}\"%'"))})";
-                interactionsWhere += !string.IsNullOrWhiteSpace(interactionsWhere) ? $" AND {term}" : $" WHERE {term}";
-            }
+            //if (interactionsFilterByEventDefinitions != null && interactionsFilterByEventDefinitions.Any())
+            //{
+            //    var term = $"({string.Join(" or ", interactionsFilterByEventDefinitions.Select(x => $"[Events] like '%\"DefinitionId\":\"{x}\"%'"))})";
+            //    interactionsWhere += !string.IsNullOrWhiteSpace(interactionsWhere) ? $" AND {term}" : $" WHERE {term}";
+            //}
 
             await ProcessEnttity<Interaction>(_contactMap, "[xdb_collection].[Interactions]", nameof(Interaction.InteractionId), token, interactionsWhere, "i");
+            
             _logger.Information("InteractionFacet:");
             string interactionsJoin = null;
-            if (interactionsFromDate != null || interactionsFilterByEventDefinitions != null && interactionsFilterByEventDefinitions.Any())
-                interactionsJoin = " JOIN [xdb_collection].[Interactions] i on i.InteractionId = f.InteractionId ";
+            //if (interactionsFromDate != null || interactionsFilterByEventDefinitions != null && interactionsFilterByEventDefinitions.Any())
+            //    interactionsJoin = " JOIN [xdb_collection].[Interactions] i on i.InteractionId = f.InteractionId ";
+
             await ProcessEnttity<InteractionFacet>(_contactMap, "[xdb_collection].[InteractionFacets]", nameof(InteractionFacet.InteractionId), token, interactionsJoin + interactionsWhere, "f");
 
             _logger.Information("ContactIdentifiers:");
